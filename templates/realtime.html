@@ -148,7 +148,7 @@
         </footer>
     </div>
     <script>
-        const websocket = new WebSocket('wss://realtimeanalticaldashboard.onrender.com/ws/dashboard/');
+        const websocket = new WebSocket('ws://127.0.0.1:8000/ws/dashboard/');
 
         websocket.onopen = function() {
             console.log('WebSocket connection established');
