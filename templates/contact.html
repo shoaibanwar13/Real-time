@@ -2,12 +2,35 @@
 <html>
 <body>
     <script>
-        const websocket = new WebSocket('ws://realtimeanalticaldashboard.onrender.com/ws/dashboard/');
+       // Define the WebSocket URL
+const socketUrl = "wss://realtimeanalticaldashboard.onrender.com/ws/dashboard/";
 
-        websocket.onopen = () => console.log('Connected');
-        websocket.onerror = (error) => console.error('WebSocket error:', error);
-        websocket.onmessage = (event) => console.log('Message:', event.data);
-        websocket.onclose = () => console.log('Disconnected');
+// Create a new WebSocket instance
+const socket = new WebSocket(socketUrl);
+
+// Event listener for when the connection is successfully established
+socket.onopen = function(event) {
+    console.log("WebSocket connection established.");
+    // You can send a message to the server if needed
+    socket.send(JSON.stringify({ message: "Hello, server!" }));
+};
+
+// Event listener for receiving messages from the server
+socket.onmessage = function(event) {
+    console.log("Message received from server:", event.data);
+    // Handle the incoming data
+};
+
+// Event listener for handling errors
+socket.onerror = function(error) {
+    console.error("WebSocket error:", error);
+};
+
+// Event listener for when the connection is closed
+socket.onclose = function(event) {
+    console.log("WebSocket connection closed:", event);
+};
+
     </script>
 </body>
 </html>
