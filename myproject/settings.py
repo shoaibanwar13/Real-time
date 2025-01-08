@@ -95,22 +95,22 @@ CACHE_TTL = 60 * 1500
 
 CACHES = {
     "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer",
-        # "LOCATION": "rediss://red-ctufmpl2ng1s739dlicg:YGPl2OKvn8JVpUa0O4ZEU3lHyKIUAVaN@singapore-redis.render.com:6379",  # Use only the URL
-        # "OPTIONS": {
-        #     "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        #     "SSL": True,  # Required for rediss://
-        # },
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "rediss://red-ctufmpl2ng1s739dlicg:YGPl2OKvn8JVpUa0O4ZEU3lHyKIUAVaN@singapore-redis.render.com:6379",  # Use only the URL
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "SSL": True,  # Required for rediss://
+        },
     }
 }
 CHANNEL_LAYERS = {
     'default': {
-        "BACKEND": "channels.layers.InMemoryChannelLayer",
-        # 'CONFIG': {
-        #     "hosts": [
-        #          "rediss://red-ctufmpl2ng1s739dlicg:YGPl2OKvn8JVpUa0O4ZEU3lHyKIUAVaN@singapore-redis.render.com:6379"
-        #     ],
-        # },
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [
+                 "rediss://red-ctufmpl2ng1s739dlicg:YGPl2OKvn8JVpUa0O4ZEU3lHyKIUAVaN@singapore-redis.render.com:6379"
+            ],
+        },
     },
 }
 
