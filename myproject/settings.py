@@ -25,8 +25,8 @@ SECRET_KEY = 'django-insecure-s(q&c1n@o4b)kv)_o0b&zg*id#&ie%m^v3*-w5!!o-u3%rh$9m
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["realtimeanalticaldashboard.onrender.com"]
-
+# ALLOWED_HOSTS = ["realtimeanalticaldashboard.onrender.com","127.0.0.1:8000"]
+ALLOWED_HOSTS = ["*"]
 CSRF_TRUSTED_ORIGINS = [
     'https://realtimeanalticaldashboard.onrender.com',
 ]
@@ -156,8 +156,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / "static"]
+import os
+
+STATIC_URL = 'static/'
+STATICFILES_DIRS=[
+    os.path.join(BASE_DIR,"static")
+    
+]
+STATIC_ROOT=os.path.join(BASE_DIR,'assests')
 
 
 # Default primary key field type
