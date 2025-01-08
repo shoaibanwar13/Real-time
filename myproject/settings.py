@@ -105,12 +105,12 @@ CACHES = {
 }
 CHANNEL_LAYERS = {
     'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [
-                 "rediss://red-ctufmpl2ng1s739dlicg:YGPl2OKvn8JVpUa0O4ZEU3lHyKIUAVaN@singapore-redis.render.com:6379"
-            ],
-        },
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+        # 'CONFIG': {
+        #     "hosts": [
+        #          "rediss://red-ctufmpl2ng1s739dlicg:YGPl2OKvn8JVpUa0O4ZEU3lHyKIUAVaN@singapore-redis.render.com:6379"
+        #     ],
+        # },
     },
 }
 
