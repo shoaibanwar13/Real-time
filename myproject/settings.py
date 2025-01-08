@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-s(q&c1n@o4b)kv)_o0b&zg*id#&ie%m^v3*-w5!!o-u3%rh$9m
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["fiscal-patti-softapex-technologies-93180648.koyeb.app"]
+ALLOWED_HOSTS = ["https://fiscal-patti-softapex-technologies-93180648.koyeb.app"]
  
 CSRF_TRUSTED_ORIGINS = [
     'https://fiscal-patti-softapex-technologies-93180648.koyeb.app',
@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'channels'
+    'channels',
+    'corsheaders'
      
 ]
  
@@ -58,7 +59,29 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware'
 ]
+
+# settings.py
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8000",
+    "http://127.0.0.1:5500",
+    "https://papaya-mochi-f4eaa1.netlify.app",
+]
+
+CORS_ALLOW_CREDENTIALS = True  # Allow cookies to be sent with requests
+
+# If you're using Django Channels, you might need to add something like this:
+# Ensure WebSockets can connect to the backend
+CORS_ALLOW_HEADERS = [
+    'content-type',
+    'accept',
+    'authorization',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
 
 ROOT_URLCONF = 'myproject.urls'
 

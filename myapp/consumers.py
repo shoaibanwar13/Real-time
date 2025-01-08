@@ -28,6 +28,156 @@ class DashboardConsumer(AsyncWebsocketConsumer):
         return list(CustomerData.objects.all().values())
 
     async def send_plot_data(self):
+        # Get customer data
+        queryset = await self.get_customer_data()
+        df = pd.DataFrame(queryset)
+
+        # Data preprocessing
+        df['marital_status'] = df['marital_status'].replace({0: 'Married', 1: 'Single'})
+
+        # Generate various plots (as done previously)
+        fig_gender = self.create_gender_plot(df)
+        fig_count = self.create_gender_count_plot(df)
+        fig_grouped = self.create_grouped_plot(df)
+        fig_age_group_pie = self.create_age_group_pie_plot(df)
+        fig_state_orders = self.create_state_orders_plot(df)
+        fig_state_amount = self.create_state_amount_plot(df)
+        fig_martial_status = self.create_marital_status_plot(df)
+        fig_occupation_count = self.create_occupation_count_plot(df)
+        fig_occupation_amount = self.create_occupation_amount_plot(df)
+        fig_product_category_count = self.create_product_category_count_plot(df)
+        fig_product_category = self.create_product_category_plot(df)
+        fig_product_id = self.create_product_id_plot(df)
+
+        # Send all plot data as JSON to WebSocket
+        await self.send(text_data=json.dumps({
+            'plot_gender': fig_gender.to_json(),
+            'plot_count': fig_count.to_json(),
+            'slack_bars': fig_grouped.to_json(),
+            'age_group_pie': fig_age_group_pie.to_json(),
+            'fig_state_orders': fig_state_orders.to_json(),
+            'fig_state_amount': fig_state_amount.to_json(),
+            'fig_martial_status': fig_martial_status.to_json(),
+            'fig_occupation_count': fig_occupation_count.to_json(),
+            'fig_occupation_amount': fig_occupation_amount.to_json(),
+            'fig_product_category_count': fig_product_category_count.to_json(),
+            'fig_product_category': fig_product_category.to_json(),
+            'fig_product_id': fig_product_id.to_json(),
+        }))
+
+    @sync_to_async
+    def update_customer_data(self):
+        # This function would be called to update customer data in the database
+        # For example, you can update the customer data when a certain action happens
+        pass
+
+    async def notify_change(self):
+        # This function can be used to notify the clients about a change
+        # This can be triggered when there's an update in the data
+
+        # Get the latest data (you can customize what changes trigger this)
+        queryset = await self.get_customer_data()
+        df = pd.DataFrame(queryset)
+
+        # Send the updated data to the client (or the updated plots, etc.)
+        await self.send(text_data=json.dumps({
+            'notification': 'Data has been updated!',
+            'updated_plot_data': df.to_dict()
+        }))
+
+    # Function to generate individual plots
+    def create_gender_plot(self, df):
+        df_grouped_gender = df.groupby('gender', as_index=False)['amount'].sum()
+        return px.bar(df_grouped_gender, x="gender", y="amount", 
+                      title="Total Amount by Gender", 
+                      labels={"gender": "Gender", "amount": "Total Amount"},
+                      color="gender")
+
+    def create_gender_count_plot(self, df):
+        df_gender_count = df['gender'].value_counts().reset_index()
+        df_gender_count.columns = ['gender', 'count']
+        return px.bar(df_gender_count, x="gender", y="count", 
+                      title="Gender Count", 
+                      labels={"gender": "Gender", "count": "Count"},
+                      color="gender")
+
+    def create_grouped_plot(self, df):
+        df_grouped = df.groupby(['age_group', 'gender'], as_index=False)['amount'].sum()
+        return px.bar(df_grouped, x="age_group", y="amount", color="gender", 
+                      title="Total Amount by Gender and Age Group", 
+                      labels={"age_group": "Age Group", "amount": "Total Amount", "gender": "Gender"},
+                      barmode="stack")
+
+    def create_age_group_pie_plot(self, df):
+        df_grouped_gender = df.groupby('age_group', as_index=False)['amount'].sum()
+        return px.pie(df_grouped_gender, names="age_group", values="amount", 
+                      title="Total Amount by Age Group", 
+                      labels={"age_group": "Age Group", "amount": "Total Amount"}, 
+                      hole=0.4)
+
+    def create_state_orders_plot(self, df):
+        orders_from_state = df.groupby('state', as_index=False)['orders'].sum()
+        return px.bar(orders_from_state, x="state", y="orders", 
+                      title="Orders From All States", 
+                      labels={"state": "State", "orders": "Orders"},
+                      color="state")
+
+    def create_state_amount_plot(self, df):
+        total_amount_from_state = df.groupby('state', as_index=False)['amount'].sum()
+        return px.bar(total_amount_from_state, x="state", y="amount", 
+                      title="Total Amount by State", 
+                      labels={"state": "State", "amount": "Amount"},
+                      color="state")
+
+    def create_marital_status_plot(self, df):
+        status_counts = df['marital_status'].value_counts().reset_index()
+        status_counts.columns = ['Marital Status', 'Count']
+        return px.bar(status_counts, x="Marital Status", y="Count", 
+                      color="Marital Status", 
+                      title="Count of Marital Status", 
+                      labels={"Count": "Number of People", "Marital Status": "Marital Status"})
+
+    def create_occupation_count_plot(self, df):
+        df_occupation = df['occupation'].value_counts().reset_index()
+        df_occupation.columns = ['occupation', 'count']
+        return px.pie(df_occupation, names="occupation", values="count", 
+                      title="Occupation Count", 
+                      labels={"occupation": "Occupation", "count": "Count"})
+
+    def create_occupation_amount_plot(self, df):
+        df_occupation_by_amount = df.groupby('occupation', as_index=False)['amount'].sum()
+        return px.pie(df_occupation_by_amount, names="occupation", values="amount", 
+                      title="Total Amount by Occupation", 
+                      labels={"occupation": "Occupation", "amount": "Amount"}, 
+                      hole=0.3)
+
+    def create_product_category_count_plot(self, df):
+        product_category_counts = df['product_category'].value_counts().reset_index()
+        product_category_counts.columns = ['product_category', 'Count']
+        return px.bar(product_category_counts, x="product_category", y="Count", 
+                      color="product_category", 
+                      title="Product Category Count", 
+                      labels={"Count": "Product Category Count", "product_category": "Product Category"})
+
+    def create_product_category_plot(self, df):
+        df_product_category = df.groupby('product_category', as_index=False)['amount'].sum()
+        return px.treemap(df_product_category, path=["product_category"], values="amount", 
+                          title="Sales Amount by Product Category")
+
+    def create_product_id_plot(self, df):
+        top_ten_sold_product = df.groupby(["product_id", "product_category"], as_index=False)["orders"].sum().sort_values(by='orders', ascending=False).head(10)
+        return px.sunburst(top_ten_sold_product, path=["product_id", "product_category"], values="orders", 
+                           title="Top 10 Sold Products", 
+                           labels={'product_id': 'Product ID', 'orders': 'Order Count'})
+
+    @sync_to_async
+    def get_customer_data(self):
+        # This function interacts with the database and is synchronous,
+        # so we use `sync_to_async` to call it inside an async function.
+        from .models import CustomerData
+        return list(CustomerData.objects.all().values())
+
+    async def send_plot_data(self):
     # Get customer data
         queryset = await self.get_customer_data()
         df = pd.DataFrame(queryset)

@@ -147,58 +147,72 @@
             <p>Powered by <strong>Your Company</strong> &copy; {{ year }}. All Rights Reserved.</p>
         </footer>
     </div>
-    <script> 
-        const websocket = new WebSocket('wss://fiscal-patti-softapex-technologies-93180648.koyeb.app/ws/dashboard/');
+    <script>
+    let websocket;
 
-        websocket.onopen = function() {
-            console.log('WebSocket connection established');
-        };
+function connectWebSocket() {
+    websocket = new WebSocket('wss://fiscal-patti-softapex-technologies-93180648.koyeb.app/ws/dashboard/');
 
-        websocket.onmessage = function(event) {
-            const data = JSON.parse(event.data);
+    websocket.onopen = () => {
+        console.log('WebSocket connected');
+    };
 
-            // Update Gender by Total Amount Chart
-            const genderChartData = JSON.parse(data.plot_gender);
-            Plotly.newPlot('plot-gender', genderChartData.data, genderChartData.layout);
+    websocket.onmessage = function(event) {
+        const data = JSON.parse(event.data);
 
-            // Update Gender Count Chart
-            const countChartData = JSON.parse(data.plot_count);
-            Plotly.newPlot('plot-count', countChartData.data, countChartData.layout);
-            const slackChartData = JSON.parse(data.slack_bars);
-            Plotly.newPlot('slack-chart', slackChartData.data, slackChartData.layout);
-            const pieChartData = JSON.parse(data.pi_graph);
-            Plotly.newPlot('plot-gender-pie_chart', pieChartData.data, pieChartData.layout);
-            const stateChartData = JSON.parse(data.fig_state);
-            Plotly.newPlot('states-chart', stateChartData.data, stateChartData.layout);
-            const fig_state_amountChartData = JSON.parse(data.fig_state_amount);
-            Plotly.newPlot('amount_state_chart', fig_state_amountChartData.data, fig_state_amountChartData.layout);
-            const fig_martialChartData = JSON.parse(data.fig_martial);
-            Plotly.newPlot('martial_status_chart', fig_martialChartData.data, fig_martialChartData.layout);
-            const mertialbyamount=JSON.parse(data.df_gender_martial_status)
-            Plotly.newPlot('mrtial_by_state', mertialbyamount.data, mertialbyamount.layout)
-            const fig_count_df_occupationchart=JSON.parse(data.fig_count_df_occupation)
-            Plotly.newPlot('Occupation', fig_count_df_occupationchart.data, fig_count_df_occupationchart.layout)
-            const fig_occupation_by_amountchart=JSON.parse(data.fig_occupation_by_amount)
-            Plotly.newPlot('fig_occupation_by_amount', fig_occupation_by_amountchart.data, fig_occupation_by_amountchart.layout)
-            const fig_product_categorychart=JSON.parse(data.fig_product_category)
-            Plotly.newPlot('fig_product_category', fig_product_categorychart.data, fig_product_categorychart.layout)
-            const product_categorychart=JSON.parse(data.product_category)
-            Plotly.newPlot('product_category', product_categorychart.data, product_categorychart.layout)
-            const fig_product_idchart=JSON.parse(data.fig_product_id)
-            Plotly.newPlot('fig_product_id', fig_product_idchart.data, fig_product_idchart.layout)
+        // Update Gender by Total Amount Chart
+        const genderChartData = JSON.parse(data.plot_gender);
+        Plotly.react('plot-gender', genderChartData.data, genderChartData.layout);
 
-            
-            
-            
-        };
+        // Update Gender Count Chart
+        const countChartData = JSON.parse(data.plot_count);
+        Plotly.react('plot-count', countChartData.data, countChartData.layout);
 
-        websocket.onclose = function() {
-            console.log('WebSocket connection closed');
-        };
+        const slackChartData = JSON.parse(data.slack_bars);
+        Plotly.react('slack-chart', slackChartData.data, slackChartData.layout);
 
-        websocket.onerror = function(error) {
-            console.error('WebSocket error:', error);
-        };
+        const pieChartData = JSON.parse(data.pi_graph);
+        Plotly.react('plot-gender-pie_chart', pieChartData.data, pieChartData.layout);
+
+        const stateChartData = JSON.parse(data.fig_state);
+        Plotly.react('states-chart', stateChartData.data, stateChartData.layout);
+
+        const figStateAmountChartData = JSON.parse(data.fig_state_amount);
+        Plotly.react('amount_state_chart', figStateAmountChartData.data, figStateAmountChartData.layout);
+
+        const figMartialChartData = JSON.parse(data.fig_martial);
+        Plotly.react('martial_status_chart', figMartialChartData.data, figMartialChartData.layout);
+
+        const maritalByAmount = JSON.parse(data.df_gender_martial_status);
+        Plotly.react('mrtial_by_state', maritalByAmount.data, maritalByAmount.layout);
+
+        const figCountDfOccupationChart = JSON.parse(data.fig_count_df_occupation);
+        Plotly.react('Occupation', figCountDfOccupationChart.data, figCountDfOccupationChart.layout);
+
+        const figOccupationByAmountChart = JSON.parse(data.fig_occupation_by_amount);
+        Plotly.react('fig_occupation_by_amount', figOccupationByAmountChart.data, figOccupationByAmountChart.layout);
+
+        const figProductCategoryChart = JSON.parse(data.fig_product_category);
+        Plotly.react('fig_product_category', figProductCategoryChart.data, figProductCategoryChart.layout);
+
+        const productCategoryChart = JSON.parse(data.product_category);
+        Plotly.react('product_category', productCategoryChart.data, productCategoryChart.layout);
+
+        const figProductIdChart = JSON.parse(data.fig_product_id);
+        Plotly.react('fig_product_id', figProductIdChart.data, figProductIdChart.layout);
+    };
+
+    websocket.onclose = function() {
+        console.log('WebSocket connection closed');
+    };
+
+    websocket.onerror = function(error) {
+        console.error('WebSocket error:', error);
+    };
+}
+
+// Start WebSocket connection
+connectWebSocket();
     </script>
 
 </body>
