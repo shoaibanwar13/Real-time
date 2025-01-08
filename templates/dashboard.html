@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Analytics Dashboard</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- FontAwesome for Icons -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+    <style>
+        .dashboard-header {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #4A90E2;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .chart h3 {
+            font-size: 1.25rem;
+            margin-bottom: 20px;
+            color: #333;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 font-sans">
+
+    <!-- Main Dashboard Container -->
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- Header Section -->
+        <div class="dashboard-header">
+            <h1>Advanced Analytics Dashboard For Dewali Sales Data</h1>
+            <p class="text-gray-600">Flipcart</p>
+        </div>
+
+        <!-- Chart Container -->
+        <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Chart 1: Gender Count -->
+            <div class="bg-white rounded-lg shadow p-4">
+                <h3 class="text-lg font-semibold text-blue-600">Gender Count</h3>
+                <div>
+                    {{ plot_html_count|safe }}
+                </div>
+            </div>
+
+            <!-- Chart 2: Total Amount by Gender -->
+            <div class="bg-white rounded-lg shadow p-4">
+                <h3 class="text-lg font-semibold text-blue-600">Total Amount by Gender</h3>
+                <div>
+                    {{ plot_html_gender|safe }}
+                </div>
+            </div>
+
+            <!-- Chart 3: Total Amount by Age Group With Gender -->
+            <div class="bg-white rounded-lg shadow p-4">
+                <h3 class="text-lg font-semibold text-blue-600">Total Amount by Age Group With Gender</h3>
+                <div>
+                    {{ plot_html_count_age_by|safe }}
+                </div>
+            </div>
+
+            <!-- Chart 4: Total Amount by Age Group -->
+            <div class="bg-white rounded-lg shadow p-4">
+                <h3 class="text-lg font-semibold text-blue-600">Total Amount by Age Group</h3>
+                <div>
+                    {{ plot_html_age_group|safe }}
+                </div>
+            </div>
+
+            <!-- Chart 5: Orders From Different States -->
+            <div class="bg-white rounded-lg shadow p-4">
+                <h3 class="text-lg font-semibold text-blue-600">Orders From Different States</h3>
+                <div>
+                    {{ plot_html_states|safe }}
+                </div>
+            </div>
+
+            <!-- Chart 6: Total Amount From Different States -->
+            <div class="bg-white rounded-lg shadow p-4">
+                <h3 class="text-lg font-semibold text-blue-600">Total Amount From Different States</h3>
+                <div>
+                    {{ plot_html_states_amount|safe }}
+                </div>
+            </div>
+
+            <!-- Chart 7: Martial Status -->
+            <div class="bg-white rounded-lg shadow p-4">
+                <h3 class="text-lg font-semibold text-blue-600">Marital Status</h3>
+                <div>
+                    {{ plot_html|safe }}
+                </div>
+            </div>
+
+            <!-- Chart 8: Total Martial Status Amount -->
+            <div class="bg-white rounded-lg shadow p-4">
+                <h3 class="text-lg font-semibold text-blue-600">Total Martial Status Amount</h3>
+                <div>
+                    {{ plot_html_fig_gender_martial_status|safe }}
+                </div>
+            </div>
+
+            <!-- Chart 9: Customers' Occupation Count -->
+            <div class="bg-white rounded-lg shadow p-4">
+                <h3 class="text-lg font-semibold text-blue-600">Customers' Occupation Count</h3>
+                <div>
+                    {{ plot_html_count_occupation|safe }}
+                </div>
+            </div>
+
+            <!-- Chart 10: Total Occupation Amount -->
+            <div class="bg-white rounded-lg shadow p-4">
+                <h3 class="text-lg font-semibold text-blue-600">Total Occupation Amount</h3>
+                <div>
+                    {{ plot_html_fig_occupation_by_amount|safe }}
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4">
+                <h3 class="text-lg font-semibold text-blue-600">Product Category Count </h3>
+                <div>
+                    {{   plot_html_product_category|safe }}
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4">
+                <h3 class="text-lg font-semibold text-blue-600">Product Category Amount</h3> 
+                <div>
+                    {{  df_product_category|safe }}
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4">
+                <h3 class="text-lg font-semibold text-blue-600">Top 10 Products Orders</h3>
+                <div>
+                    {{  html_fig_product|safe }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Section -->
+        <footer class="mt-12 text-center text-sm text-gray-600">
+            <p>Powered by <strong>Your Company</strong> &copy; {{ year }}. All Rights Reserved.</p>
+        </footer>
+    </div>
+
+</body>
+
+</html>

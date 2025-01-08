@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group Chat</title>
+    <script src="https://cdn.jsdelivr.net/npm/tailwindcss@3.1.0/dist/tailwind.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org"></script>
+    <style>
+        .message-container {
+            transition: transform 0.3s ease;
+        }
+
+        .message-container.replying {
+            transform: translateX(-100px); /* Simulate swipe left */
+        }
+
+        .reply-message {
+            background-color: #f0f4f8;
+            padding: 8px;
+            border-radius: 4px;
+            margin-bottom: 4px;
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+        .reply-bubble {
+            background-color: #e6f7ff;
+            border-left: 4px solid #1E90FF;
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <div class="max-w-3xl mx-auto bg-white rounded-lg shadow-lg mt-10 p-6">
+        <h1 class="text-3xl font-semibold text-center text-blue-600 mb-6">Group Chat</h1>
+
+        <div id="chat-box" class="space-y-4 h-96 overflow-y-auto p-4 bg-gray-50 rounded-lg shadow-inner">
+            {% for message in messages %}
+                <div class="message-container flex items-start space-x-2 {% if message.username == 'admin' %}justify-end{% else %}justify-start{% endif %}" 
+                     data-message-id="{{ message.id }}" onclick="replyToMessage(event)">
+                    <div class="bg-blue-500 text-white rounded-full w-10 h-10 flex items-center justify-center text-lg font-semibold">
+                        {{ message.username|slice:":1" }}
+                    </div>
+                    <div class="flex-1">
+                        {% if message.reply_to %}
+                            <div class="reply-bubble">
+                                <p><strong>Replying to:</strong> {{ message.reply_to.content }}</p>
+                            </div>
+                        {% endif %}
+                        <div class="bg-blue-100 p-4 rounded-lg max-w-xs shadow-md {% if message.username == 'admin' %}ml-auto bg-blue-600 text-white{% else %}bg-gray-200 text-gray-800{% endif %}">
+                            <p class="font-semibold">{{ message.username }}:</p>
+                            <p>{{ message.content }}</p>
+                            <p class="text-xs text-gray-500 mt-1">{{ message.timestamp }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Reply Message Card (shows the message you're replying to) -->
+        <div id="reply-card" class="bg-blue-50 p-4 rounded-lg shadow-md hidden mb-4">
+            <p class="font-semibold text-gray-700">Replying to:</p>
+            <div id="reply-message" class="text-gray-600"></div>
+        </div>
+
+        <form id="chat-form" method="POST" class="mt-6 flex space-x-4">
+            {% csrf_token %}
+            <input type="hidden" id="username" placeholder="Your name" required class="w-1/4 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600" value="{{request.user.username}}">
+            <input type="text" id="content" placeholder="Type a message" required class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
+            <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">Send</button>
+        </form>
+    </div>
+
+    <script>
+        let replyToMessageId = null; // Stores the ID of the message being replied to
+        let replyContent = ""; // Stores the content of the message being replied to
+
+        const socket = new WebSocket('ws://' + window.location.host + '/ws/chat/');
+
+        // When a message is received from the WebSocket
+        socket.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            const chatBox = document.getElementById('chat-box');
+            const newMessage = `
+                <div class="message-container flex items-start space-x-2 {% if data.username == 'admin' %}justify-end{% else %}justify-start{% endif %}" 
+                     data-message-id="${data.id}" onclick="replyToMessage(event)">
+                    <div class="bg-blue-500 text-white rounded-full w-10 h-10 flex items-center justify-center text-lg font-semibold">
+                        ${data.username[0]}
+                    </div>
+                    <div class="flex-1">
+                        ${data.reply_to ? `<div class="reply-bubble"><p><strong>Replying to:</strong> ${data.reply_to.content}</p></div>` : ''}
+                        <div class="bg-blue-100 p-4 rounded-lg max-w-xs shadow-md ${data.username == 'admin' ? 'ml-auto bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}">
+                            <p class="font-semibold">${data.username}:</p>
+                            <p>${data.content}</p>
+                            <p class="text-xs text-gray-500 mt-1">${data.timestamp}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            chatBox.innerHTML += newMessage;
+            chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the bottom
+        };
+
+        // Event listener for the chat form submission
+        const chatForm = document.getElementById('chat-form');
+        chatForm.addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const username = document.getElementById('username').value;
+            const content = document.getElementById('content').value;
+
+            // Send the message via WebSocket
+            socket.send(JSON.stringify({
+                'username': username,
+                'content': content,
+                'reply_to': replyToMessageId ? { 'id': replyToMessageId } : null
+            }));
+
+            // Optionally, clear the input fields after sending
+            document.getElementById('content').value = '';
+            replyToMessageId = null; // Reset reply message ID
+            replyContent = ""; // Reset reply content
+            document.getElementById('reply-card').classList.add('hidden'); // Hide the reply card after sending
+        });
+
+        // Function to handle message click and start replying
+        // Function to handle message click and start replying
+function replyToMessage(event) {
+    const messageContainer = event.currentTarget;
+    const messageId = messageContainer.getAttribute('data-message-id');
+    const content = messageContainer.querySelector('.bg-blue-100 p').textContent; // Get only the message content
+
+    // Store the message content to reply
+    replyContent = content.trim();
+
+    // Add class to show swipe effect
+    messageContainer.classList.add('replying');
+
+    // Set the ID of the message to be replied to
+    replyToMessageId = messageId;
+
+    // Populate the reply card with the message content and show it
+    const replyCard = document.getElementById('reply-card');
+    const replyMessage = document.getElementById('reply-message');
+    replyMessage.textContent = `Replying to: ${replyContent}`; // Display the original content
+    replyCard.classList.remove('hidden'); // Show the reply card
+
+    // Optionally, add the reply content into the input field
+    document.getElementById('content').value = `@${replyContent} `; // Pre-fill input with the message you're replying to
+}
+ </script>
+
+</body>
+</html>

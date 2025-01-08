@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Analytics Dashboard</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- FontAwesome for Icons -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.plot.ly/plotly-2.20.0.min.js"></script>
+
+    <style>
+        .dashboard-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #4A90E2;
+        }
+
+        .dashboard-header p {
+            color: #6B7280;
+            font-size: 1rem;
+        }
+
+        .chart-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            background: #ffffff;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+        }
+
+        .chart-container h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1F2937;
+            margin-bottom: 1rem;
+        }
+
+        #plot-gender,
+        #plot-count,
+        #slack-chart,
+        #plot-gender-pie_chart,
+        #states-chart,
+        #amount_state_chart,
+        #martial_status_chart,
+        #mrtial_by_state,
+        #Occupation,
+        #fig_occupation_by_amount,
+        #fig_product_category,
+        #product_category,
+        #fig_product_id {
+            width: 100%;
+            height: 400px;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+
+    <!-- Main Dashboard Container -->
+    <div class="container mx-auto px-6 py-8">
+
+        <!-- Header Section -->
+        <div class="dashboard-header text-center mb-10">
+            <h1>Real Time Advanced Analytics Dashboard</h1>
+            <p>Flipkart | Diwali Sales Data Insights</p>
+        </div>
+
+        <!-- Chart Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+            <!-- Chart Cards -->
+            <div class="chart-container">
+                <h3>Gender Count</h3>
+                <div id="plot-gender"></div>
+            </div>
+
+            <div class="chart-container">
+                <h3>Total Amount by Gender</h3>
+                <div id="plot-count"></div>
+            </div>
+
+            <div class="chart-container">
+                <h3>Total Amount by Age Group & Gender</h3>
+                <div id="slack-chart"></div>
+            </div>
+
+            <div class="chart-container">
+                <h3>Total Amount by Age Group</h3>
+                <div id="plot-gender-pie_chart"></div>
+            </div>
+
+            <div class="chart-container">
+                <h3>Orders from Different States</h3>
+                <div id="states-chart"></div>
+            </div>
+
+            <div class="chart-container">
+                <h3>Total Amount from Different States</h3>
+                <div id="amount_state_chart"></div>
+            </div>
+
+            <div class="chart-container">
+                <h3>Marital Status</h3>
+                <div id="martial_status_chart"></div>
+            </div>
+
+            <div class="chart-container">
+                <h3>Total Marital Status Amount</h3>
+                <div id="mrtial_by_state"></div>
+            </div>
+
+            <div class="chart-container">
+                <h3>Customers' Occupation Count</h3>
+                <div id="Occupation"></div>
+            </div>
+
+            <div class="chart-container">
+                <h3>Total Occupation Amount</h3>
+                <div id="fig_occupation_by_amount"></div>
+            </div>
+
+            <div class="chart-container">
+                <h3>Product Category Count</h3>
+                <div id="fig_product_category"></div>
+            </div>
+
+            <div class="chart-container">
+                <h3>Product Category Amount</h3>
+                <div id="product_category"></div>
+            </div>
+
+            <div class="chart-container">
+                <h3>Top 10 Products Orders</h3>
+                <div id="fig_product_id"></div>
+            </div>
+        </div>
+
+        <!-- Footer Section -->
+        <footer class="mt-12 text-center text-gray-600 text-sm">
+            <p>Powered by <strong>Your Company</strong> &copy; 2025. All Rights Reserved.</p>
+        </footer>
+    </div>
+    <script>
+        const websocket = new WebSocket('ws://127.0.0.1:8000/ws/dashboard/'); // Adjust URL to your WebSocket route
+
+        websocket.onopen = function() {
+            console.log('WebSocket connection established');
+        };
+
+        websocket.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+
+            // Update Gender by Total Amount Chart
+            const genderChartData = JSON.parse(data.plot_gender);
+            Plotly.newPlot('plot-gender', genderChartData.data, genderChartData.layout);
+
+            // Update Gender Count Chart
+            const countChartData = JSON.parse(data.plot_count);
+            Plotly.newPlot('plot-count', countChartData.data, countChartData.layout);
+            const slackChartData = JSON.parse(data.slack_bars);
+            Plotly.newPlot('slack-chart', slackChartData.data, slackChartData.layout);
+            const pieChartData = JSON.parse(data.pi_graph);
+            Plotly.newPlot('plot-gender-pie_chart', pieChartData.data, pieChartData.layout);
+            const stateChartData = JSON.parse(data.fig_state);
+            Plotly.newPlot('states-chart', stateChartData.data, stateChartData.layout);
+            const fig_state_amountChartData = JSON.parse(data.fig_state_amount);
+            Plotly.newPlot('amount_state_chart', fig_state_amountChartData.data, fig_state_amountChartData.layout);
+            const fig_martialChartData = JSON.parse(data.fig_martial);
+            Plotly.newPlot('martial_status_chart', fig_martialChartData.data, fig_martialChartData.layout);
+            const mertialbyamount=JSON.parse(data.df_gender_martial_status)
+            Plotly.newPlot('mrtial_by_state', mertialbyamount.data, mertialbyamount.layout)
+            const fig_count_df_occupationchart=JSON.parse(data.fig_count_df_occupation)
+            Plotly.newPlot('Occupation', fig_count_df_occupationchart.data, fig_count_df_occupationchart.layout)
+            const fig_occupation_by_amountchart=JSON.parse(data.fig_occupation_by_amount)
+            Plotly.newPlot('fig_occupation_by_amount', fig_occupation_by_amountchart.data, fig_occupation_by_amountchart.layout)
+            const fig_product_categorychart=JSON.parse(data.fig_product_category)
+            Plotly.newPlot('fig_product_category', fig_product_categorychart.data, fig_product_categorychart.layout)
+            const product_categorychart=JSON.parse(data.product_category)
+            Plotly.newPlot('product_category', product_categorychart.data, product_categorychart.layout)
+            const fig_product_idchart=JSON.parse(data.fig_product_id)
+            Plotly.newPlot('fig_product_id', fig_product_idchart.data, fig_product_idchart.layout)
+
+            
+            
+            
+        };
+
+        websocket.onclose = function() {
+            console.log('WebSocket connection closed');
+        };
+
+        websocket.onerror = function(error) {
+            console.error('WebSocket error:', error);
+        };
+    </script>
+</body>
+
+</html>
