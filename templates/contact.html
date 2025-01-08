@@ -1,2 +1,13 @@
-<h1 class="text-3xl font-bold text-center">Contact Us</h1>
-<p class="text-center mt-4 text-gray-600">This is the contact page.</p>
+<!DOCTYPE html>
+<html>
+<body>
+    <script>
+        const websocket = new WebSocket('ws://realtimeanalticaldashboard.onrender.com/ws/dashboard/');
+
+        websocket.onopen = () => console.log('Connected');
+        websocket.onerror = (error) => console.error('WebSocket error:', error);
+        websocket.onmessage = (event) => console.log('Message:', event.data);
+        websocket.onclose = () => console.log('Disconnected');
+    </script>
+</body>
+</html>

@@ -81,7 +81,7 @@
         let replyToMessageId = null; // Stores the ID of the message being replied to
         let replyContent = ""; // Stores the content of the message being replied to
 
-        const socket = new WebSocket('ws://' + window.location.host + '/ws/chat/');
+        const socket = new WebSocket('wss://' + window.location.host + '/ws/chat/');
 
         // When a message is received from the WebSocket
         socket.onmessage = function(event) {
