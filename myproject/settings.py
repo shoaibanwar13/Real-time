@@ -29,7 +29,7 @@ ALLOWED_HOSTS = ["https://fiscal-patti-softapex-technologies-93180648.koyeb.app"
  
 CSRF_TRUSTED_ORIGINS = [
     'https://fiscal-patti-softapex-technologies-93180648.koyeb.app',
-    'https://papaya-mochi-f4eaa1.netlify.app/'
+    'https://realtimeanalticaldashbordandchatapp.netlify.app/'
 ]
 
 # Application definition
